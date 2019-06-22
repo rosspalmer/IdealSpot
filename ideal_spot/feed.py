@@ -135,8 +135,7 @@ class WindForecastDecorator(ForecastWeatherFeedDecorator):
 
 class ForecastWeatherFeedFactory:
 
-    def __init__(self, name: str, lat: float, long: float):
-        self.name = name
+    def __init__(self, lat: float, long: float):
         self.lat = lat
         self.long = long
 
