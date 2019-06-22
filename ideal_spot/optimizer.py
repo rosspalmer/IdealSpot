@@ -17,19 +17,26 @@ class Spot:
     def add_data(self, name: str, data: Any):
         self.data[name] = data
 
-    def calculate_overall_score(self):
-        self.overall_score = 0.0
-        for score in self.scores.values():
-            self.overall_score += score
-
     def get_data(self, name: str) -> Any:
         return self.data[name]
+
+    def get_lat(self) -> float:
+        return self.lat
+
+    def get_long(self) -> float:
+        return self.long
 
     def get_overall_score(self) -> float:
         return self.overall_score
 
-    def set_score(self, name: str, score: float):
-        self.scores[name] = score
+    def get_scores(self) -> Dict[str, float]:
+        return self.scores
+
+    def set_overall_score(self, overall_score: float):
+        self.overall_score = overall_score
+
+    def set_scores(self, scores: Dict[str, float]):
+        self.scores = scores
 
     def __eq__(self, other) -> bool:
         return self.lat == other.lat and self.long == other.long
@@ -41,14 +48,20 @@ class Spot:
 class EvaluateSpots:
 
     @staticmethod
-    def score_spots(spots: Set[Spot], target_weight_map: Dict[WeatherTarget, float]) -> Set[Spot]:
+    def score_spots(spots: Set[Spot], target: WeatherTarget, score_weight_map: Dict[str, float] = None) -> Set[Spot]:
 
         for spot in spots:
 
-            for target, weight in target_weight_map.items():
-                score = target.calculate_objective(spot)
-                spot.set_score(target.get_name(), score * weight)
+            target.evaluate_spot(spot)
 
-            spot.calculate_overall_score()
+            overall_score = 0.0
+            for score_name, score in spot.get_scores().items():
+
+                weight = 1.0
+                if score_weight_map is not None and score_name in score_weight_map:
+                    weight = score_weight_map[score_name]
+                overall_score += score * weight
+
+            spot.set_overall_score(overall_score)
 
         return spots
