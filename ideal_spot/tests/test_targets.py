@@ -18,6 +18,7 @@ class _DummyRangeTargetDecorator(RangeTargetDecorator):
 class TestRangeTargetDecorator:
 
     def test_calculate_score(self):
+
         df = DataFrame([
             {'datetime': datetime(2019, 1, 1, 1), 'value': 1.0},
             {'datetime': datetime(2019, 1, 1, 8), 'value': 2.1},
@@ -26,7 +27,7 @@ class TestRangeTargetDecorator:
             {'datetime': datetime(2019, 1, 2, 1), 'value': 5.4},
         ])
 
-        target = WeatherTarget()
+        target = WeatherTarget('not used')
         target.set_forecast_data(df)
 
         sum_target = _DummyRangeTargetDecorator(target, 'sum_test', datetime(2019, 1, 1, 6), datetime(2019, 1, 1, 20),
@@ -62,7 +63,7 @@ class TestIdealValueTargetDecorator:
             {'datetime': datetime(2019, 1, 2, 1), 'value': 5.4},
         ])
 
-        target = WeatherTarget()
+        target = WeatherTarget('not used')
         target.set_forecast_data(df)
 
         ideal_target = _DummyIdealValueTargetDecorator(target, 'ideal_test',
@@ -123,7 +124,7 @@ class TestEvaluateSpots:
         spot_b = Spot('spot_b', 2.3, 101.2)
         spots = {spot_a, spot_b}
 
-        target = _DummyDataWeatherTarget()
+        target = _DummyDataWeatherTarget('not used')
         target = IdealTempTarget(target, 'ideal_temp', datetime(2019, 1, 1, 6), datetime(2019, 1, 1, 20), 220.0)
 
         spots = EvaluateSpots.score_spots(spots, target)

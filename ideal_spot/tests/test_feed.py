@@ -3,12 +3,15 @@ import pytest
 
 from ideal_spot.feed import ForecastWeatherFeed, ForecastWeatherFeedFactory
 
+# OpenWeatherMap free API key
+TEST_API_KEY = '79094518408cb847574557c958eeec91'
+
 
 class TestForecastWeatherFeed:
 
     def test_generate_data(self):
 
-        feed = ForecastWeatherFeed('test', 40.0, 104.0)
+        feed = ForecastWeatherFeed(TEST_API_KEY, 40.0, 104.0)
 
         data = feed.get_data()
 
@@ -20,7 +23,7 @@ class TestTemperatureForecastDecorator:
 
     def test_generate_data(self):
 
-        feed = ForecastWeatherFeedFactory('temp_test', 40.0, 104.0).generate_feed({'temp'})
+        feed = ForecastWeatherFeedFactory(TEST_API_KEY, 40.0, 104.0).generate_feed({'temp'})
 
         data = feed.get_data()
 
@@ -32,7 +35,7 @@ class TestRainForecastDecorator:
 
     def test_generate_data(self):
 
-        feed = ForecastWeatherFeedFactory('rain_test', 40.0, 104.0).generate_feed({'rain'})
+        feed = ForecastWeatherFeedFactory(TEST_API_KEY, 40.0, 104.0).generate_feed({'rain'})
 
         data = feed.get_data()
 
@@ -44,7 +47,7 @@ class TestSnowForecastDecorator:
 
     def test_generate_data(self):
 
-        feed = ForecastWeatherFeedFactory('snow_test', 40.0, 104.0).generate_feed({'snow'})
+        feed = ForecastWeatherFeedFactory(TEST_API_KEY, 40.0, 104.0).generate_feed({'snow'})
 
         data = feed.get_data()
 
@@ -56,7 +59,7 @@ class TestCloudForecastDecorator:
 
     def test_generate_data(self):
 
-        feed = ForecastWeatherFeedFactory('cloud_test', 40.0, 104.0).generate_feed({'cloud'})
+        feed = ForecastWeatherFeedFactory(TEST_API_KEY, 40.0, 104.0).generate_feed({'cloud'})
 
         data = feed.get_data()
 
@@ -68,7 +71,7 @@ class TestWindForecastDecorator:
 
     def test_generate_data(self):
 
-        feed = ForecastWeatherFeedFactory('wind_test', 40.0, 104.0).generate_feed({'wind'})
+        feed = ForecastWeatherFeedFactory(TEST_API_KEY, 40.0, 104.0).generate_feed({'wind'})
 
         data = feed.get_data()
 
@@ -80,8 +83,8 @@ class TestForecastWeatherFeedFactory:
 
     def test_generate_data_all_metrics(self):
 
-        feed = ForecastWeatherFeedFactory('all_test', 40.0, 104.0).generate_feed({'temp', 'rain', 'snow',
-                                                                                  'cloud', 'wind'})
+        feed = ForecastWeatherFeedFactory(TEST_API_KEY, 40.0, 104.0).generate_feed({'temp', 'rain', 'snow',
+                                                                                    'cloud', 'wind'})
 
         data = feed.get_data()
 

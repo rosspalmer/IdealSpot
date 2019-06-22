@@ -10,9 +10,13 @@ from requests import get
 
 class WeatherFeed(ABC):
 
-    def __init__(self, lat: float, long: float):
+    def __init__(self, api_key: str, lat: float, long: float):
+        self.api_key = api_key
         self.lat = lat
         self.long = long
+
+    def get_api_key(self) -> str:
+        return self.api_key
 
     def get_data(self) -> DataFrame:
         api_data = get(self._get_api_call()).content
@@ -36,16 +40,13 @@ class WeatherFeed(ABC):
 
 class ForecastWeatherFeed(WeatherFeed):
 
-    def __init__(self, lat: float, long: float):
-        super().__init__(lat, long)
+    def __init__(self, api_key: str, lat: float, long: float):
+        super().__init__(api_key, lat, long)
 
     def _get_api_call(self) -> str:
 
-        # OpenWeatherMap free key
-        api_key = '79094518408cb847574557c958eeec91'
-
         api_call = f'http://api.openweathermap.org/data/2.5/forecast?lat={self.lat}&lon={self.long}' \
-            + f'&appid={api_key}'
+            + f'&appid={self.api_key}'
 
         return api_call
 
@@ -71,8 +72,11 @@ class ForecastWeatherFeed(WeatherFeed):
 class ForecastWeatherFeedDecorator(ForecastWeatherFeed, ABC):
 
     def __init__(self, feed: ForecastWeatherFeed):
-        super().__init__(feed.get_lat(), feed.get_long())
+        super().__init__(feed.get_api_key(), feed.get_lat(), feed.get_long())
         self.feed = feed
+
+    def get_api_key(self) -> str:
+        return self.feed.get_api_key()
 
     def get_lat(self) -> float:
         return self.feed.get_lat()
@@ -135,7 +139,8 @@ class WindForecastDecorator(ForecastWeatherFeedDecorator):
 
 class ForecastWeatherFeedFactory:
 
-    def __init__(self, lat: float, long: float):
+    def __init__(self, api_key: str, lat: float, long: float):
+        self.api_key = api_key
         self.lat = lat
         self.long = long
 
@@ -149,7 +154,7 @@ class ForecastWeatherFeedFactory:
 
     def generate_feed(self, forecast_metrics: Set[str]) -> ForecastWeatherFeed:
 
-        forecast_feed = ForecastWeatherFeed(self.lat, self.long)
+        forecast_feed = ForecastWeatherFeed(self.api_key, self.lat, self.long)
 
         for forecast_metric in forecast_metrics:
 

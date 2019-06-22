@@ -10,7 +10,8 @@ from spots import Spot
 
 class WeatherTarget(ABC):
 
-    def __init__(self):
+    def __init__(self, api_key: str):
+        self.api_key = api_key
         self.forecast_data = None
 
     def evaluate_spot(self, spot: Spot):
@@ -18,6 +19,9 @@ class WeatherTarget(ABC):
         feed_data = self.generate_forecast_data(spot, metrics)
         self.set_forecast_data(feed_data)
         spot.set_scores(self.calculate_scores(spot))
+
+    def get_api_key(self) -> str:
+        return self.api_key
 
     def get_forecast_data(self) -> DataFrame:
         return self.forecast_data
@@ -32,7 +36,7 @@ class WeatherTarget(ABC):
         return dict()
 
     def generate_forecast_data(self, spot: Spot, metrics: Set[str]) -> DataFrame:
-        feed = ForecastWeatherFeedFactory(spot.get_lat(), spot.get_long()).generate_feed(metrics)
+        feed = ForecastWeatherFeedFactory(self.get_api_key(), spot.get_lat(), spot.get_long()).generate_feed(metrics)
         feed_data = feed.get_data()
         return feed_data
 
@@ -40,9 +44,12 @@ class WeatherTarget(ABC):
 class WeatherTargetDecorator(WeatherTarget, ABC):
 
     def __init__(self, target: WeatherTarget, name: str):
-        super().__init__()
+        super().__init__(target.get_api_key())
         self.target = target
         self.name = name
+
+    def get_api_key(self) -> str:
+        return self.target.get_api_key()
 
     def get_forecast_data(self) -> DataFrame:
         return self.target.get_forecast_data()
@@ -170,9 +177,6 @@ class IdealWindTarget(IdealValueTargetDecorator):
 
 
 class EvaluateSpots:
-
-    # @staticmethod
-    # def
 
     @staticmethod
     def score_spots(spots: Set[Spot], target: WeatherTarget, score_weight_map: Dict[str, float] = None) -> Set[Spot]:
