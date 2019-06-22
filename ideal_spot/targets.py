@@ -119,24 +119,23 @@ class NewSnowTarget(RangeTargetDecorator):
         return metrics
 
 
-class IdealValueTargetDecorator(RangeTargetDecorator):
+class IdealValueTargetDecorator(RangeTargetDecorator, ABC):
 
     def __init__(self, target: WeatherTarget, name: str, range_start: datetime, range_end: datetime,
                  value_name: str, max_value: float, min_value: float, ideal_value: float):
         super().__init__(target, name, range_start, range_end, value_name, max_value, min_value, 'mean')
         self.ideal_value = ideal_value
 
-    def get_forecast_metrics(self) -> Set[str]:
-        pass
-
     def _calculate_score(self, spot: Spot) -> float:
 
-        normalized_ideal_value = (self.ideal_value - self.min_value) / (self.max_value - self.min_value)
         normalized_value_average = super()._calculate_score(spot)
+        value_average = normalized_value_average * (self.max_value - self.min_value) + self.min_value
 
-        score = 1 - abs(normalized_ideal_value - normalized_value_average)
+        score = abs(self.ideal_value - value_average)
+        normalized_score = (score - self.min_value) / (self.max_value - self.min_value)
+        normalized_score = 1.0 - normalized_score
 
-        return score
+        return normalized_score
 
 
 class IdealTempTarget(IdealValueTargetDecorator):
@@ -163,6 +162,9 @@ class IdealWindTarget(IdealValueTargetDecorator):
 
 
 class EvaluateSpots:
+
+    # @staticmethod
+    # def
 
     @staticmethod
     def score_spots(spots: Set[Spot], target: WeatherTarget, score_weight_map: Dict[str, float] = None) -> Set[Spot]:
