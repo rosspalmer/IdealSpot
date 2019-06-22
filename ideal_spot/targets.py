@@ -50,7 +50,7 @@ class WeatherTargetDecorator(WeatherTarget, ABC):
         return self.target.get_forecast_metrics()
 
     def calculate_scores(self, spot: Spot) -> Dict:
-        scores = self.calculate_scores(spot)
+        scores = self.target.calculate_scores(spot)
         scores[self.name] = self._calculate_score(spot)
         return scores
 
@@ -71,18 +71,26 @@ class RangeTargetDecorator(WeatherTargetDecorator, ABC):
         self.min_value = min_value
         self.operation = operation
 
+        assert self.max_value > self.min_value, 'Max value %s must be larger than min value %s' % (str(self.max_value),
+                                                                                                   str(self.min_value))
         assert self.operation in ['sum', 'mean']
 
     def _calculate_score(self, spot: Spot) -> float:
 
         df = self.get_forecast_data()
+
         df = df[df['datetime'] >= self.range_start]
         df = df[df['datetime'] <= self.range_end]
 
-        cumulative_value = df[self.value_name].sum()
+        cumulative_value = None
+        if self.operation == 'sum':
+            cumulative_value = df[self.value_name].sum()
+        elif self.operation == 'mean':
+            cumulative_value = df[self.value_name].mean()
+
         normalized_cumulative_value = (cumulative_value - self.min_value) / (self.max_value - self.min_value)
-        normalized_cumulative_value = max(self.min_value, normalized_cumulative_value)
-        normalized_cumulative_value = min(self.max_value, normalized_cumulative_value)
+        normalized_cumulative_value = max(0.0, normalized_cumulative_value)
+        normalized_cumulative_value = min(1.0, normalized_cumulative_value)
 
         return normalized_cumulative_value
 
