@@ -10,16 +10,20 @@ from requests import get
 
 class WeatherFeed(ABC):
 
-    def __init__(self, name: str):
-        self.name = name
+    def __init__(self, lat: float, long: float):
+        self.lat = lat
+        self.long = long
 
     def get_data(self) -> DataFrame:
         api_data = get(self._get_api_call()).content
         data = self._generate_data(api_data)
         return data
 
-    def get_name(self) -> str:
-        return self.name
+    def get_lat(self) -> float:
+        return self.lat
+
+    def get_long(self) -> float:
+        return self.long
 
     @abstractmethod
     def _get_api_call(self) -> str:
@@ -29,31 +33,11 @@ class WeatherFeed(ABC):
     def _generate_data(self, api_data: str) -> DataFrame:
         pass
 
-    def __eq__(self, other) -> bool:
-        return self.name == other.name
 
-    def __hash__(self) -> int:
-        return hash(self.name)
+class ForecastWeatherFeed(WeatherFeed):
 
-
-class CoordinateWeatherFeed(WeatherFeed, ABC):
-
-    def __init__(self, name: str, lat: float, long: float):
-        super().__init__(name)
-        self.lat = lat
-        self.long = long
-
-    def get_lat(self) -> float:
-        return self.lat
-
-    def get_long(self) -> float:
-        return self.long
-
-
-class ForecastWeatherFeed(CoordinateWeatherFeed):
-
-    def __init__(self, name: str, lat: float, long: float):
-        super().__init__(name, lat, long)
+    def __init__(self, lat: float, long: float):
+        super().__init__(lat, long)
 
     def _get_api_call(self) -> str:
 
@@ -87,11 +71,8 @@ class ForecastWeatherFeed(CoordinateWeatherFeed):
 class ForecastWeatherFeedDecorator(ForecastWeatherFeed, ABC):
 
     def __init__(self, feed: ForecastWeatherFeed):
-        super().__init__(feed.get_name(), feed.get_lat(), feed.get_long())
+        super().__init__(feed.get_lat(), feed.get_long())
         self.feed = feed
-
-    def get_name(self) -> str:
-        return self.feed.get_name()
 
     def get_lat(self) -> float:
         return self.feed.get_lat()
@@ -169,7 +150,7 @@ class ForecastWeatherFeedFactory:
 
     def generate_feed(self, forecast_metrics: Set[str]) -> ForecastWeatherFeed:
 
-        forecast_feed = ForecastWeatherFeed(self.name, self.lat, self.long)
+        forecast_feed = ForecastWeatherFeed(self.lat, self.long)
 
         for forecast_metric in forecast_metrics:
 
