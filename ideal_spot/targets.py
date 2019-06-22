@@ -25,13 +25,11 @@ class WeatherTarget(ABC):
     def set_forecast_data(self, forecast_data: DataFrame):
         self.forecast_data = forecast_data
 
-    @abstractmethod
     def get_forecast_metrics(self) -> Set[str]:
         return set()
 
-    @abstractmethod
     def calculate_scores(self, spot: Spot) -> Dict:
-        pass
+        return dict()
 
 
 class WeatherTargetDecorator(WeatherTarget, ABC):
@@ -154,3 +152,25 @@ class IdealWindTarget(IdealValueTargetDecorator):
         metrics = self.get_forecast_metrics()
         metrics.add('wind')
         return metrics
+
+
+class EvaluateSpots:
+
+    @staticmethod
+    def score_spots(spots: Set[Spot], target: WeatherTarget, score_weight_map: Dict[str, float] = None) -> Set[Spot]:
+
+        for spot in spots:
+
+            target.evaluate_spot(spot)
+
+            overall_score = 0.0
+            for score_name, score in spot.get_scores().items():
+
+                weight = 1.0
+                if score_weight_map is not None and score_name in score_weight_map:
+                    weight = score_weight_map[score_name]
+                overall_score += score * weight
+
+            spot.set_overall_score(overall_score)
+
+        return spots

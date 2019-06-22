@@ -1,6 +1,4 @@
-from typing import Any, Dict, Set
-
-from ideal_spot.targets import WeatherTarget
+from typing import Any, Dict
 
 
 class Spot:
@@ -43,25 +41,3 @@ class Spot:
 
     def __hash__(self) -> int:
         return hash([self.lat, self.long])
-
-
-class EvaluateSpots:
-
-    @staticmethod
-    def score_spots(spots: Set[Spot], target: WeatherTarget, score_weight_map: Dict[str, float] = None) -> Set[Spot]:
-
-        for spot in spots:
-
-            target.evaluate_spot(spot)
-
-            overall_score = 0.0
-            for score_name, score in spot.get_scores().items():
-
-                weight = 1.0
-                if score_weight_map is not None and score_name in score_weight_map:
-                    weight = score_weight_map[score_name]
-                overall_score += score * weight
-
-            spot.set_overall_score(overall_score)
-
-        return spots
