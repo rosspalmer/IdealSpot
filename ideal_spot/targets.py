@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 
-from data import WeatherDataBase
 from optimizer import Spot
 
 
@@ -13,11 +12,7 @@ class WeatherTarget(ABC):
         return self.name
 
     @abstractmethod
-    def add_data_to_db(self, spot: Spot, db: WeatherDataBase) -> WeatherDataBase:
-        pass
-
-    @abstractmethod
-    def calculate_objective(self, spot: Spot, db: WeatherDataBase) -> float:
+    def calculate_objective(self, spot: Spot) -> float:
         pass
 
     def __eq__(self, other):

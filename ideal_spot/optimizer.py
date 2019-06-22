@@ -1,6 +1,5 @@
 from typing import Dict, Set
 
-from data import WeatherDataBase
 from ideal_spot.targets import WeatherTarget
 
 
@@ -37,15 +36,12 @@ class EvaluateSpots:
     @staticmethod
     def score_spots(spots: Set[Spot], target_weight_map: Dict[WeatherTarget, float]) -> Set[Spot]:
 
-        db = WeatherDataBase()
-
         for spot in spots:
+
             for target, weight in target_weight_map.items():
-                db = target.add_data_to_db(spot, db)
-                score = target.calculate_objective(spot, db)
+                score = target.calculate_objective(spot)
                 spot.set_score(target.get_name(), score * weight)
 
-        for spot in spots:
             spot.calculate_overall_score()
 
         return spots
