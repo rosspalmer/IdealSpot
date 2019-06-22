@@ -1,5 +1,4 @@
 
-from pandas import DataFrame
 import pytest
 
 from ideal_spot.feed import ForecastWeatherFeed, ForecastWeatherFeedFactory
