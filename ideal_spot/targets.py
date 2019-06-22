@@ -179,6 +179,18 @@ class IdealWindTarget(IdealValueTargetDecorator):
 class EvaluateSpots:
 
     @staticmethod
+    def generate_spots(df: DataFrame, name_column: str, lat_column: str, long_column: str) -> Set[Spot]:
+
+        spots_data = df[[name_column, lat_column, long_column]].to_dict('records')
+
+        spots = set()
+        for spot_data in spots_data:
+            spot = Spot(spot_data[name_column], spot_data[lat_column], spot_data[long_column])
+            spots.add(spot)
+
+        return spots
+
+    @staticmethod
     def score_spots(spots: Set[Spot], target: WeatherTarget, score_weight_map: Dict[str, float] = None) -> Set[Spot]:
 
         for spot in spots:

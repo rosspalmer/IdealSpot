@@ -118,6 +118,32 @@ class _DummyDataWeatherTarget(WeatherTarget):
 
 class TestEvaluateSpots:
 
+    def test_generate_spots(self):
+
+        df = DataFrame([
+            {'spot_name': 'spot_a', 'spot_lat': 78.0, 'spot_long': 104.0},
+            {'spot_name': 'spot_b', 'spot_lat': 2.3, 'spot_long': 101.2},
+        ])
+
+        spots = EvaluateSpots.generate_spots(df, 'spot_name', 'spot_lat', 'spot_long')
+
+        assert isinstance(spots, set)
+        assert len(spots) == 2
+
+        for spot in spots:
+
+            assert isinstance(spot, Spot)
+
+            if spot.get_name() == 'spot_a':
+                assert round(spot.get_lat(), 4) == 78.0
+                assert round(spot.get_long(), 4) == 104.0
+            elif spot.get_name() == 'spot_b':
+                assert round(spot.get_lat(), 4) == 2.3
+                assert round(spot.get_long(), 4) == 101.2
+
+            else:
+                raise AssertionError('Did not expect spot')
+
     def test_score_spots_ideal_temp(self):
 
         spot_a = Spot('spot_a', 78.0, 104.0)
