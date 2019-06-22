@@ -63,8 +63,6 @@ class ForecastWeatherFeed(CoordinateWeatherFeed):
         api_call = f'http://api.openweathermap.org/data/2.5/forecast?lat={self.lat}&lon={self.long}' \
             + f'&appid={api_key}'
 
-        print(api_call)
-
         return api_call
 
     def _generate_data(self, api_data: str) -> DataFrame:
