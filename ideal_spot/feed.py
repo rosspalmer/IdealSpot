@@ -157,9 +157,7 @@ class ForecastWeatherFeedFactory:
         forecast_feed = ForecastWeatherFeed(self.api_key, self.lat, self.long)
 
         for forecast_metric in forecast_metrics:
-
             assert forecast_metric in self.forecast_decorators, 'Forecast metric %s is not supported' % forecast_metric
-
             forecast_feed = self.forecast_decorators[forecast_metric](forecast_feed)
 
         return forecast_feed

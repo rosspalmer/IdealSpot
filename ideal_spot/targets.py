@@ -203,7 +203,6 @@ class EvaluateSpots:
                 weight = 1.0
                 if score_weight_map is not None and score_name in score_weight_map:
                     weight = score_weight_map[score_name]
-
                 overall_score += score * weight
 
             spot.set_overall_score(overall_score)
