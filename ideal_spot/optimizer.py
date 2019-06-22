@@ -1,4 +1,4 @@
-from typing import Dict, Set
+from typing import Any, Dict, Set
 
 from ideal_spot.targets import WeatherTarget
 
@@ -12,17 +12,24 @@ class Spot:
 
         self.scores = dict()
         self.overall_score = 0.0
+        self.data = dict()
+
+    def add_data(self, name: str, data: Any):
+        self.data[name] = data
 
     def calculate_overall_score(self):
         self.overall_score = 0.0
         for score in self.scores.values():
             self.overall_score += score
 
-    def set_score(self, name: str, score: float):
-        self.scores[name] = score
+    def get_data(self, name: str) -> Any:
+        return self.data[name]
 
     def get_overall_score(self) -> float:
         return self.overall_score
+
+    def set_score(self, name: str, score: float):
+        self.scores[name] = score
 
     def __eq__(self, other) -> bool:
         return self.lat == other.lat and self.long == other.long
