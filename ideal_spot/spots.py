@@ -4,6 +4,7 @@ from typing import Any, Dict
 class Spot:
 
     def __init__(self, name: str, lat: float, long: float):
+
         self.name = name
         self.lat = lat
         self.long = long
@@ -24,6 +25,9 @@ class Spot:
     def get_long(self) -> float:
         return self.long
 
+    def get_name(self) -> str:
+        return self.name
+
     def get_overall_score(self) -> float:
         return self.overall_score
 
@@ -37,7 +41,7 @@ class Spot:
         self.scores = scores
 
     def __eq__(self, other) -> bool:
-        return self.lat == other.lat and self.long == other.long
+        return self.get_name() == other.get_name()
 
     def __hash__(self) -> int:
-        return hash([self.lat, self.long])
+        return hash(self.get_name())

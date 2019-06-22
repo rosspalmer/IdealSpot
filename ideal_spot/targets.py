@@ -4,7 +4,7 @@ from typing import Dict, Set
 
 from pandas import DataFrame
 
-from feed import ForecastWeatherFeedFactory
+from feed import ForecastWeatherFeed, ForecastWeatherFeedFactory
 from spots import Spot
 
 
@@ -15,8 +15,8 @@ class WeatherTarget(ABC):
 
     def evaluate_spot(self, spot: Spot):
         metrics = self.get_forecast_metrics()
-        feed = ForecastWeatherFeedFactory(spot.get_lat(), spot.get_long()).generate_feed(metrics)
-        self.set_forecast_data(feed.get_data())
+        feed_data = self.generate_forecast_data(spot, metrics)
+        self.set_forecast_data(feed_data)
         spot.set_scores(self.calculate_scores(spot))
 
     def get_forecast_data(self) -> DataFrame:
@@ -30,6 +30,11 @@ class WeatherTarget(ABC):
 
     def calculate_scores(self, spot: Spot) -> Dict:
         return dict()
+
+    def generate_forecast_data(self, spot: Spot, metrics: Set[str]) -> DataFrame:
+        feed = ForecastWeatherFeedFactory(spot.get_lat(), spot.get_long()).generate_feed(metrics)
+        feed_data = feed.get_data()
+        return feed_data
 
 
 class WeatherTargetDecorator(WeatherTarget, ABC):
@@ -53,6 +58,9 @@ class WeatherTargetDecorator(WeatherTarget, ABC):
         scores = self.target.calculate_scores(spot)
         scores[self.name] = self._calculate_score(spot)
         return scores
+
+    def generate_forecast_data(self, spot: Spot, metrics: Set[str]) -> DataFrame:
+        return self.target.generate_forecast_data(spot, metrics)
 
     @abstractmethod
     def _calculate_score(self, spot: Spot) -> float:
@@ -102,7 +110,7 @@ class NewRainTarget(RangeTargetDecorator):
         # FIXME determine ideal max rain value
 
     def get_forecast_metrics(self) -> Set[str]:
-        metrics = self.get_forecast_metrics()
+        metrics = super().get_forecast_metrics()
         metrics.add('rain')
         return metrics
 
@@ -114,7 +122,7 @@ class NewSnowTarget(RangeTargetDecorator):
         # FIXME determine ideal max snow value
 
     def get_forecast_metrics(self) -> Set[str]:
-        metrics = self.get_forecast_metrics()
+        metrics = super().get_forecast_metrics()
         metrics.add('snow')
         return metrics
 
@@ -132,7 +140,7 @@ class IdealValueTargetDecorator(RangeTargetDecorator, ABC):
         value_average = normalized_value_average * (self.max_value - self.min_value) + self.min_value
 
         score = abs(self.ideal_value - value_average)
-        normalized_score = (score - self.min_value) / (self.max_value - self.min_value)
+        normalized_score = score / (self.max_value - self.min_value)
         normalized_score = 1.0 - normalized_score
 
         return normalized_score
@@ -145,7 +153,7 @@ class IdealTempTarget(IdealValueTargetDecorator):
         # FIXME determine ideal temperature range
 
     def get_forecast_metrics(self) -> Set[str]:
-        metrics = self.get_forecast_metrics()
+        metrics = super().get_forecast_metrics()
         metrics.add('temp')
         return metrics
 
@@ -156,7 +164,7 @@ class IdealWindTarget(IdealValueTargetDecorator):
         super().__init__(target, name, range_start, range_end, 'wind', 100.0, 0.0, ideal_wind)
 
     def get_forecast_metrics(self) -> Set[str]:
-        metrics = self.get_forecast_metrics()
+        metrics = super().get_forecast_metrics()
         metrics.add('wind')
         return metrics
 
@@ -179,6 +187,7 @@ class EvaluateSpots:
                 weight = 1.0
                 if score_weight_map is not None and score_name in score_weight_map:
                     weight = score_weight_map[score_name]
+
                 overall_score += score * weight
 
             spot.set_overall_score(overall_score)

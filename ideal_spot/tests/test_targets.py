@@ -4,7 +4,9 @@ from typing import Set
 from pandas import DataFrame
 import pytest
 
-from targets import RangeTargetDecorator, WeatherTarget, IdealValueTargetDecorator
+from feed import ForecastWeatherFeed
+from spots import Spot
+from targets import RangeTargetDecorator, WeatherTarget, IdealValueTargetDecorator, IdealTempTarget, EvaluateSpots
 
 
 class _DummyRangeTargetDecorator(RangeTargetDecorator):
@@ -78,6 +80,65 @@ class TestIdealValueTargetDecorator:
 
         assert len(scores) == 1
         assert round(scores['ideal_test'], 5) == 0.68
+
+
+class _DummyDataWeatherTarget(WeatherTarget):
+
+    def generate_forecast_data(self, spot: Spot, metrics: Set[str]) -> ForecastWeatherFeed:
+
+        print(spot.get_lat())
+        print(spot.get_long())
+
+        if spot.get_lat() == 78.0 and spot.get_long() == 104.0:
+
+            df = DataFrame([
+                {'datetime': datetime(2019, 1, 1, 1), 'temp': 210.0},
+                {'datetime': datetime(2019, 1, 1, 8), 'temp': 254.2},
+                {'datetime': datetime(2019, 1, 1, 14), 'temp': 304.2},
+                {'datetime': datetime(2019, 1, 1, 20), 'temp': 298.0},
+                {'datetime': datetime(2019, 1, 2, 1), 'temp': 301.0},
+            ])
+
+        elif spot.get_lat() == 2.3 and spot.get_long() == 101.2:
+
+            df = DataFrame([
+                {'datetime': datetime(2019, 1, 1, 1), 'temp': 242.0},
+                {'datetime': datetime(2019, 1, 1, 8), 'temp': 244.2},
+                {'datetime': datetime(2019, 1, 1, 14), 'temp': 224.2},
+                {'datetime': datetime(2019, 1, 1, 20), 'temp': 233.0},
+                {'datetime': datetime(2019, 1, 2, 1), 'temp': 301.5},
+            ])
+
+        else:
+            raise AssertionError('Spot coordinates are not supported')
+
+        return df
+
+
+class TestEvaluateSpots:
+
+    def test_score_spots_ideal_temp(self):
+
+        spot_a = Spot('spot_a', 78.0, 104.0)
+        spot_b = Spot('spot_b', 2.3, 101.2)
+        spots = {spot_a, spot_b}
+
+        target = _DummyDataWeatherTarget()
+        target = IdealTempTarget(target, 'ideal_temp', datetime(2019, 1, 1, 6), datetime(2019, 1, 1, 20), 220.0)
+
+        spots = EvaluateSpots.score_spots(spots, target)
+
+        for spot in spots:
+
+            if spot.get_name() == 'spot_a':
+                assert len(spot.get_scores()) == 1
+                assert round(spot.get_scores()['ideal_temp'], 4) == 0.6727
+            elif spot.get_name() == 'spot_b':
+                assert len(spot.get_scores()) == 1
+                assert round(spot.get_scores()['ideal_temp'], 4) == 0.931
+
+            else:
+                raise AssertionError('Did not expect spot %s' % spot.get_name())
 
 
 if __name__ == '__main__':
