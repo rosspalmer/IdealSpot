@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, Set
 
 from feed import ForecastWeatherFeedFactory, ForecastWeatherFeed
-from optimizer import Spot
+from spots import Spot
 
 
 class WeatherTarget(ABC):
