@@ -168,7 +168,7 @@ class IdealTempTarget(IdealValueTargetDecorator):
 class IdealWindTarget(IdealValueTargetDecorator):
 
     def __init__(self, target: WeatherTarget, name: str, range_start: datetime, range_end: datetime, ideal_wind: float):
-        super().__init__(target, name, range_start, range_end, 'wind', 100.0, 0.0, ideal_wind)
+        super().__init__(target, name, range_start, range_end, 'wind', 50.0, 0.0, ideal_wind)
 
     def get_forecast_metrics(self) -> Set[str]:
         metrics = super().get_forecast_metrics()
