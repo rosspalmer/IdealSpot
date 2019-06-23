@@ -34,6 +34,7 @@ _Future Features_
     - Campsites / Trails
     - Resort proximity
     - Transportation infrastructure
+- **Support for more weather APIs**
 
 ## Quick Start Guide
 
@@ -50,3 +51,15 @@ Generating scores / data requires three major steps below:
 generate reports
 
 Examples can be found in the **examples** folder.
+
+## Weather Data
+
+Currently this package utilizes the OpenWeatherMap API and requires that
+you create a free person account for an API key.
+
+https://openweathermap.org/
+
+The forecast targets utilize the 5 day / 3 hr forecast feed.
+
+Future development will introduce support for additional APIs as well as 
+a generalized user defined API calls. 
