@@ -10,7 +10,7 @@ We will go twice, once right now for eight hours and then
 again twenty fours later at the same spot (guess the
 transporter broke?!). 
 
-For sailing we want about 15 m/s, a temperature of ~295K (22C),
+For sailing we want about 10 m/s, a temperature of ~295K (22C),
 and no precipitation. While temperature and rain are important
 to consider, wind is much more critical.
 """
@@ -33,8 +33,8 @@ end_time_second_day = start_time_second_day + timedelta(hours=8)
 
 # Construct WeatherTarget based on sailing needs
 target = WeatherTarget('79094518408cb847574557c958eeec91')
-target = IdealWindTarget(target, 'wind_day_one', start_time_first_day, end_time_first_day, 15.0)
-target = IdealWindTarget(target, 'wind_day_two', start_time_second_day, end_time_second_day, 15.0)
+target = IdealWindTarget(target, 'wind_day_one', start_time_first_day, end_time_first_day, 10.0)
+target = IdealWindTarget(target, 'wind_day_two', start_time_second_day, end_time_second_day, 10.0)
 target = IdealTempTarget(target, 'temp_day_one', start_time_first_day, end_time_first_day, 295.0)
 target = IdealTempTarget(target, 'temp_day_two', start_time_second_day, end_time_second_day, 295.0)
 target = NewRainTarget(target, 'rain_day_one', start_time_first_day, end_time_first_day)
@@ -51,3 +51,33 @@ score_report = score_report.sort_values('overall_score', ascending=False)
 print(score_report[['name', 'overall_score']])
 print(score_report[['name', 'wind_day_one', 'wind_day_two']])
 print(score_report[['name', 'rain_day_one', 'temp_day_one', 'rain_day_two', 'temp_day_two']])
+
+"""
+
+Example Output:
+
+          name  overall_score
+2    San Diego       4.358843
+3     Auckland       4.341185
+1       Athens       4.272057
+5  Montego Bay       4.125707
+4    Vancouver       3.966885
+0        Tokyo       3.960065
+
+          name  wind_day_one  wind_day_two
+2    San Diego      0.861500      0.822417
+3     Auckland      0.821417      0.873917
+1       Athens      0.785583      0.862583
+5  Montego Bay      0.862750      0.848667
+4    Vancouver      0.779250      0.792500
+0        Tokyo      0.925917      0.826833
+
+          name  rain_day_one  temp_day_one  rain_day_two  temp_day_two
+2    San Diego        0.0000      0.996317        0.0000      0.985703
+3     Auckland        0.0000      0.948833        0.0000      0.952203
+1       Athens        0.0000      0.975483        0.0000      0.975963
+5  Montego Bay        0.1312      0.963483        0.4000      0.973463
+4    Vancouver        0.1875      0.968367        0.0938      0.959703
+0        Tokyo        1.0000      0.982967        0.0688      0.994963
+
+"""
