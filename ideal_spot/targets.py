@@ -4,7 +4,7 @@ from typing import Dict, Set
 
 from pandas import DataFrame
 
-from feed import ForecastWeatherFeed, ForecastWeatherFeedFactory
+from feed import ForecastWeatherFeedFactory
 from spots import Spot
 
 
@@ -177,9 +177,32 @@ class IdealWindTarget(IdealValueTargetDecorator):
 
 
 class EvaluateSpots:
+    """
+    EvaluateSpots is a functional class with main static
+    methods for processing Spots and data
+    """
 
     @staticmethod
     def generate_spots(df: DataFrame, name_column: str, lat_column: str, long_column: str) -> Set[Spot]:
+        """
+        Convert pandas DataFrame into set of Spot classes
+
+        Parameters
+        ----------
+        df : DataFrame
+            pandas DataFrame with spot data for each row, requires three columns below
+        name_column : str
+            Name of column for string spot name
+        lat_column : str
+            Name of column for latitude float value
+        long_column : str
+            Name of column for longitude float value
+
+        Returns
+        -------
+        Set[Spot]
+            Set of configured Spot classes
+        """
 
         spots_data = df[[name_column, lat_column, long_column]].to_dict('records')
 
@@ -192,6 +215,26 @@ class EvaluateSpots:
 
     @staticmethod
     def score_spots(spots: Set[Spot], target: WeatherTarget, score_weight_map: Dict[str, float] = None) -> Set[Spot]:
+        """
+        Apply scoring to a set of Spots using a configured WeatherTarget.
+        An weight map may be used to adjust the individual weight of the
+        WeatherTarget decorators. The string keys are based on the names
+        specified for the individual decorator.
+
+        Parameters
+        ----------
+        spots : Set[Spot]
+            Set of un-scored spots
+        target : WeatherTarget
+            Configure WeatherTarget class used to generate scores
+        score_weight_map : Dict[str, float]
+            Optional weight map for WeatherClass decorators
+
+        Returns
+        -------
+        Set[Spot]
+            Set of Spots with scores and overall score set
+        """
 
         for spot in spots:
 
