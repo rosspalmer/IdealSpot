@@ -81,3 +81,32 @@ class EvaluateSpots:
             spot.set_overall_score(overall_score)
 
         return spots
+
+    @staticmethod
+    def generate_score_report(spots: Set[Spot]) -> DataFrame:
+        """
+        Generate score summary report which gives overall score
+        for each spot as well as individual decorator score
+
+        Parameters
+        ----------
+        spots : Set[Spot]
+            Set of scored Spots
+
+        Returns
+        -------
+        DataFrame
+            Score summary table
+        """
+
+        data = []
+
+        for spot in spots:
+            spot_data = {'name': spot.get_name(), 'lat': spot.get_lat(), 'long': spot.get_long(),
+                         'overall_score': spot.get_overall_score()}
+            spot_data.update(spot.get_scores())
+            data.append(spot_data)
+
+        df = DataFrame(data)
+
+        return df
