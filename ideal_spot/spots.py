@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Dict
 
 
 class Spot:
@@ -11,13 +11,6 @@ class Spot:
 
         self.scores = dict()
         self.overall_score = 0.0
-        self.data = dict()
-
-    def add_data(self, name: str, data: Any):
-        self.data[name] = data
-
-    def get_data(self, name: str) -> Any:
-        return self.data[name]
 
     def get_lat(self) -> float:
         return self.lat
