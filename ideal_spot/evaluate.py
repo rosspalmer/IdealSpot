@@ -108,5 +108,6 @@ class EvaluateSpots:
             data.append(spot_data)
 
         df = DataFrame(data)
+        df = df.sort_values('overall_score', ascending=False)
 
         return df

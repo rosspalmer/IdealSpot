@@ -44,10 +44,11 @@ target = NewRainTarget(target, 'rain_day_two', start_time_second_day, end_time_s
 score_weights = {'wind_day_one': 2.0, 'wind_day_two': 2.0, 'temp_day_one': 0.5, 'temp_day_two': 0.5,
                  'rain_day_one': -0.5, 'rain_day_two': -0.5}
 
+# Evaluate spots and generate score report
 spots = EvaluateSpots.score_spots(spots, target, score_weights)
 score_report = EvaluateSpots.generate_score_report(spots)
-score_report = score_report.sort_values('overall_score', ascending=False)
 
+# Output results
 print(score_report[['name', 'overall_score']])
 print(score_report[['name', 'wind_day_one', 'wind_day_two']])
 print(score_report[['name', 'rain_day_one', 'temp_day_one', 'rain_day_two', 'temp_day_two']])
